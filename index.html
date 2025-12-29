@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2025 贵金属夜航(截至12-26)</title>
+    <title>2025 贵金属夜航·触控增强版</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; }
+        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; -webkit-tap-highlight-color: transparent; }
         
         #loading {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #ffd700; font-size: 20px; font-weight: bold; z-index: 999;
+            color: #ffd700; font-size: 16px; font-weight: bold; z-index: 999;
             text-shadow: 0 0 10px black; pointer-events: none;
         }
 
@@ -38,6 +38,7 @@
             box-shadow: 0 0 25px rgba(255,215,0,0.3);
             pointer-events: none; border: 1px solid #666;
             min-width: 140px; z-index: 100;
+            transform: translate(10px, 10px); /* 稍微偏离手指一点 */
         }
         .metal-tag { padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; font-weight: bold; color: #000; display: inline-block;}
         #tooltip .price { font-size: 20px; font-weight: bold; color: #ffd700; font-family: 'DIN Alternate', sans-serif; }
@@ -90,7 +91,8 @@
         }
         .btn-turbo { background: #ff4d4f; font-size: 24px; }
         .btn-turbo:active { transform: scale(0.95); background: #ff7875; }
-        .btn-pause { background: #1890ff; width: 50px; height: 50px; font-size: 20px;}
+        /* 手机端不再需要专门的暂停键，点击屏幕即可 */
+        .btn-pause { background: #1890ff; width: 50px; height: 50px; font-size: 20px; display: none;} 
 
         @media (max-width: 768px) { .month-nav { display: none; } }
         @media (min-width: 769px) { #mobile-controls { display: none; } }
@@ -101,13 +103,13 @@
 </head>
 <body>
 
-    <div id="loading">资源加载中，请稍候...</div>
+    <div id="loading">资源加载中...</div>
 
     <div id="ui-layer" style="display:none;">
         <div class="top-panel">
             <div class="header-box">
-                <h1>🚀 2025 贵金属夜航 <span class="badge">万能版</span></h1>
-                <p class="sub-text">真实收盘价复盘 | 暂停后视角锁定</p>
+                <h1>🚀 2025 贵金属夜航 <span class="badge">触控版</span></h1>
+                <p class="sub-text">点任意柱子即可暂停查看</p>
             </div>
         </div>
 
@@ -125,7 +127,7 @@
             <button class="month-btn" onclick="jumpToMonth(8)">9月</button>
             <button class="month-btn" onclick="jumpToMonth(11)">12月</button>
             <button class="month-btn" style="background:#444;" onclick="resetCamera()">🔄 重置</button>
-            <div style="color:#666; font-size:12px; margin-left:10px; align-self:center;">空格暂停 | Shift加速</div>
+            <div style="color:#666; font-size:12px; margin-left:10px; align-self:center;">点击画面暂停/查看 | Shift加速</div>
         </div>
 
         <div id="mobile-controls">
@@ -137,16 +139,12 @@
             </div>
             
             <div class="action-area">
-                <button id="mobPauseBtn" class="round-btn btn-pause" onclick="toggleFlight()">⏸</button>
                 <button class="round-btn btn-turbo" ontouchstart="setTurbo(true)" ontouchend="setTurbo(false)">🚀</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 核心修复：直接使用全局变量，不使用 import
-        
-        // 等待页面加载完成
         window.onload = function() {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('ui-layer').style.display = 'flex';
@@ -158,7 +156,7 @@
         let clickableObjects = [];
         let isFlying = true;
         
-        // 真实数据注入
+        // 真实数据
         const metals = [
             { id: 'Pt', name: '现货铂金', color: '#e5e4e2' },
             { id: 'Au', name: '现货黄金', color: '#ffd700' },
@@ -264,7 +262,6 @@
             return new THREE.CanvasTexture(canvas);
         }
 
-        // --- 2. 场景初始化 ---
         function initGame() {
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
             scene = new THREE.Scene();
@@ -286,7 +283,6 @@
             dirLight.shadow.mapSize.height = 4096;
             scene.add(dirLight);
 
-            // 构建3D世界
             const redMat = new THREE.MeshStandardMaterial({ color: 0xff4d4f, roughness: 0.2 });
             const greenMat = new THREE.MeshStandardMaterial({ color: 0x00b894, roughness: 0.2 });
             const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
@@ -345,7 +341,6 @@
                 });
             }
 
-            // 飞机
             planeGroup = new THREE.Group();
             const body = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.5, 16), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 }));
             body.rotation.x = -Math.PI / 2;
@@ -359,7 +354,6 @@
             planeGroup.position.set(startCenterX, 35, 20); 
             scene.add(planeGroup);
 
-            // HUD
             metals.forEach((metal, idx) => {
                 const posX = idx * laneGapX - 5 + (cellSize * 3); 
                 const hudTex = createTextTexture(metal.name, 80, metal.color); 
@@ -370,21 +364,17 @@
                 hudLabels.push({ mesh: hudMesh, xOffset: posX });
             });
 
-            // 初始化控制器
             controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = false; // 禁用阻尼，完全静止
+            controls.enableDamping = false; 
             controls.enablePan = false;
-            controls.enableRotate = false; // 始终禁止旋转，确保不晕
-            controls.enableZoom = false; // 禁用缩放，防止穿模
+            controls.enableRotate = false; 
+            controls.enableZoom = false; 
             controls.target.set(startCenterX, 0, -20);
 
-            // 强制更新一次相机位置
             updateCameraPosition(true);
-
             animate();
         }
 
-        // --- 5. 交互与控制 ---
         let baseSpeed = 0.2;
         let turboSpeed = 1.0; 
         let currentSpeed = baseSpeed;
@@ -401,7 +391,6 @@
         const minY = 5; 
         const maxY = 60;
 
-        // 键盘事件
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
@@ -418,28 +407,26 @@
             if (e.key === 'Shift') setTurbo(false);
         });
 
-        // 触摸事件
         window.setKey = function(keyName, active) { keys[keyName] = active; };
 
         window.toggleFlight = function() {
             isFlying = !isFlying;
             const btn = document.getElementById('toggleBtn');
-            const mobBtn = document.getElementById('mobPauseBtn');
             const txt = isFlying ? "⏸ 暂停飞行" : "▶ 继续飞行";
-            const icon = isFlying ? "⏸" : "▶";
             if(btn) { btn.innerText = txt; btn.classList.toggle('stop', !isFlying); }
-            if(mobBtn) { mobBtn.innerText = icon; mobBtn.style.background = isFlying ? "#1890ff" : "#ff4d4f"; }
+            
+            // 暂停后立即停止物理速度
+            if(!isFlying) {
+                planeVelocityX = 0;
+                planeVelocityY = 0;
+                // 强制锁定相机位置，防止漂移
+                updateCameraPosition(true);
+            }
         };
 
         window.setTurbo = function(active) {
-            const btn = document.getElementById('turboBtn');
-            if(active) {
-                currentSpeed = turboSpeed;
-                if(btn) btn.style.transform = "scale(1.1)";
-            } else {
-                currentSpeed = baseSpeed;
-                if(btn) btn.style.transform = "scale(1)";
-            }
+            if(active) currentSpeed = turboSpeed;
+            else currentSpeed = baseSpeed;
         };
 
         window.jumpToMonth = function(monthIndex) {
@@ -452,7 +439,7 @@
             planeGroup.position.x = startCenterX; 
             planeGroup.position.y = 35; 
             
-            // 强制瞬移更新相机，不插值
+            // 强制瞬移更新相机
             updateCameraPosition(true);
         };
 
@@ -461,29 +448,33 @@
             if(!isFlying) toggleFlight();
         }
 
+        // 统一处理点击和触摸
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let selectedObj = null;
 
-        window.addEventListener('click', (e) => {
-            if (isFlying) return; 
-            if (e.target.closest('#mobile-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
-            
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        function handleRaycast(x, y) {
+            mouse.x = (x / window.innerWidth) * 2 - 1;
+            mouse.y = -(y / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(clickableObjects);
             const tooltip = document.getElementById('tooltip');
 
             if (intersects.length > 0) {
+                // 如果在飞行中点击，则暂停
+                if(isFlying) {
+                    toggleFlight();
+                }
+
+                // 选中并高亮
                 if(selectedObj) selectedObj.material.emissive.setHex(0x000000);
                 selectedObj = intersects[0].object;
                 selectedObj.material.emissive.setHex(0xaaaaaa);
 
                 const data = selectedObj.userData;
                 tooltip.style.display = 'block';
-                tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 150) + 'px';
-                tooltip.style.top = e.clientY + 15 + 'px';
+                tooltip.style.left = Math.min(x + 15, window.innerWidth - 150) + 'px';
+                tooltip.style.top = y + 15 + 'px';
                 
                 document.getElementById('tt-metal').innerText = data.metalName;
                 document.getElementById('tt-metal').className = `metal-tag tag-${data.metalId}`;
@@ -493,21 +484,40 @@
                 pEl.innerText = (data.change >= 0 ? "+" : "") + data.change.toFixed(2) + "%";
                 pEl.className = "percent " + (data.change >= 0 ? "txt-red" : "txt-green");
             } else {
-                tooltip.style.display = 'none';
-                if(selectedObj) selectedObj.material.emissive.setHex(0x000000);
-                selectedObj = null;
+                // 如果点空了，仅在暂停状态下隐藏tooltip，不恢复飞行
+                if(!isFlying) {
+                    tooltip.style.display = 'none';
+                    if(selectedObj) selectedObj.material.emissive.setHex(0x000000);
+                    selectedObj = null;
+                } else {
+                    // 飞行中点空 -> 暂停
+                    toggleFlight();
+                }
             }
+        }
+
+        // PC Click
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('#mobile-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
+            handleRaycast(e.clientX, e.clientY);
         });
 
-        // 封装相机逻辑
+        // Mobile Touch
+        window.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#mobile-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                handleRaycast(touch.clientX, touch.clientY);
+            }
+        }, {passive: false});
+
+
         function updateCameraPosition(force = false) {
-            // 基础相机位置 (PC默认)
             let camHeight = Math.max(20, planeGroup.position.y + 10);
             let camDist = 40;
             
-            // 手机端适配：屏幕越窄，拉得越远越高
             const aspect = window.innerWidth / window.innerHeight;
-            if(aspect < 1.0) { // 竖屏
+            if(aspect < 1.0) { 
                 camHeight += 20; 
                 camDist += 30;   
             }
@@ -516,7 +526,7 @@
             targetCamPos.y = camHeight;
             targetCamPos.z += camDist;
             
-            // 关键修改：如果force=true(跳转/重置) 或者 isFlying=false(暂停)，直接瞬移，不平滑
+            // 核心修改：如果是强制更新(跳转) 或者 暂停状态，直接瞬移，不插值
             if (force || !isFlying) {
                 camera.position.copy(targetCamPos);
                 const lookTarget = planeGroup.position.clone();
@@ -524,8 +534,8 @@
                 camera.lookAt(lookTarget);
                 if(controls) controls.target.copy(lookTarget);
             } else {
-                // 只有在飞行时才开启一点点平滑
-                camera.position.lerp(targetCamPos, 0.1); // 加快跟随速度，减少“漂移感”
+                // 飞行时平滑跟随
+                camera.position.lerp(targetCamPos, 0.1); 
                 const lookTarget = planeGroup.position.clone();
                 lookTarget.z -= 20;
                 camera.lookAt(lookTarget);
@@ -563,11 +573,10 @@
                 planeGroup.rotation.z = -planeVelocityX * 0.5;
                 planeGroup.rotation.x = planeVelocityY * 0.3;
 
-                // 只有飞行时更新相机
                 updateCameraPosition(false);
 
             } else {
-                // 暂停时强制锁定相机位置，防止 OrbitControls 惯性漂移
+                // 暂停时强制锁定相机
                 updateCameraPosition(true);
             }
 
@@ -586,7 +595,6 @@
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-                // 窗口改变时强制重置视角
                 updateCameraPosition(true);
             }
         });
