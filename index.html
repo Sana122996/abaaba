@@ -2,85 +2,151 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 贵金属实盘复盘 (美元修正版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2025 贵金属夜航·手机完美适配版</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #f0f2f5; font-family: 'Microsoft YaHei', sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; /* 禁止默认触摸行为 */ }
         
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-between;
+            z-index: 10;
         }
 
-        .header {
-            position: absolute; top: 20px; left: 20px; pointer-events: auto;
-            background: rgba(255,255,255,0.95); padding: 15px 25px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
-            border-left: 5px solid #d63031;
+        /* 顶部面板 */
+        .top-panel { padding: 15px; pointer-events: auto; }
+        .header-box {
+            background: rgba(20, 20, 20, 0.9); padding: 10px 15px; border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); border-left: 4px solid #ffd700; color: #fff;
+            display: inline-block; max-width: 90%;
         }
-        h1 { margin: 0; font-size: 24px; color: #1a1a1a; font-weight: 800; display: flex; align-items: center; gap: 10px;}
-        .badge { background: #d63031; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; vertical-align: middle; }
-        .sub-text { font-size: 13px; color: #666; margin-top: 5px; font-weight: 500;}
-
-        /* 底部控制栏 */
-        #controls {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            pointer-events: auto; display: flex; gap: 15px;
-            background: rgba(0,0,0,0.8); padding: 12px 25px; border-radius: 40px;
-            backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        button {
-            background: #1890ff; color: white; border: none; padding: 10px 24px;
-            font-size: 15px; font-weight: bold; border-radius: 20px; cursor: pointer;
-            transition: all 0.2s; white-space: nowrap;
-        }
-        button:hover { transform: scale(1.05); background: #40a9ff; }
-        button.stop { background: #ff4d4f; }
-
-        /* 悬浮提示框 */
+        h1 { margin: 0; font-size: 18px; color: #ffd700; font-weight: 800; display: flex; align-items: center; gap: 8px;}
+        .badge { background: #ffd700; color: #000; padding: 1px 6px; font-size: 10px; border-radius: 4px; }
+        .sub-text { font-size: 12px; color: #aaa; margin-top: 4px; }
+        
+        /* 提示框 */
         #tooltip {
             position: absolute; display: none;
-            background: rgba(20, 20, 30, 0.95); color: #fff;
-            padding: 15px; border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            pointer-events: none; border: 1px solid #555;
-            min-width: 180px; z-index: 100;
+            background: rgba(0, 0, 0, 0.95); color: #fff;
+            padding: 12px; border-radius: 8px;
+            box-shadow: 0 0 25px rgba(255,215,0,0.3);
+            pointer-events: none; border: 1px solid #666;
+            min-width: 140px; z-index: 100;
         }
-        #tooltip .metal-tag { 
-            display: inline-block; padding: 2px 6px; border-radius: 4px; 
-            font-size: 14px; margin-bottom: 5px; font-weight: bold; color: #000;
+        .metal-tag { padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; font-weight: bold; color: #000; display: inline-block;}
+        #tooltip .price { font-size: 20px; font-weight: bold; color: #ffd700; font-family: 'DIN Alternate', sans-serif; }
+        .txt-red { color: #ff4d4f; } .txt-green { color: #00cc66; }
+        
+        .tag-Au { background-color: #ffd700; } .tag-Ag { background-color: #c0c0c0; }
+        .tag-Pt { background-color: #e5e4e2; } .tag-Pd { background-color: #ced4da; }
+
+        /* --- 手机端虚拟控制器 --- */
+        #mobile-controls {
+            position: absolute; bottom: 20px; width: 100%; height: 160px;
+            pointer-events: none; /* 让点击穿透空白区域 */
+            display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box;
         }
-        #tooltip h3 { margin: 5px 0 10px 0; font-size: 14px; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        #tooltip .price { font-size: 22px; font-weight: bold; color: #fff; font-family: 'DIN Alternate', sans-serif; }
-        #tooltip .percent { font-size: 18px; font-weight: bold; display: block; margin-top: 5px;}
         
-        .txt-red { color: #ff4d4f; }
-        .txt-green { color: #00cc66; }
+        /* 十字方向键区域 */
+        .d-pad {
+            position: relative; width: 140px; height: 140px;
+            pointer-events: auto; /* 允许触摸 */
+        }
+        .d-btn {
+            position: absolute; width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px; backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; color: #fff; user-select: none;
+        }
+        .d-btn:active { background: rgba(255, 215, 0, 0.5); border-color: #ffd700; }
         
-        /* 品种颜色标记 */
-        .tag-Au { background-color: #ffd700; }
-        .tag-Ag { background-color: #c0c0c0; }
-        .tag-Pt { background-color: #e5e4e2; }
-        .tag-Pd { background-color: #ced4da; }
+        .btn-up { top: 0; left: 47.5px; }
+        .btn-down { bottom: 0; left: 47.5px; }
+        .btn-left { top: 47.5px; left: 0; }
+        .btn-right { top: 47.5px; right: 0; }
+
+        /* 右侧操作区 */
+        .action-area {
+            display: flex; flex-direction: column; gap: 15px; align-items: flex-end;
+            pointer-events: auto;
+        }
+        .round-btn {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: none; color: white; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center; font-size: 14px;
+        }
+        .btn-turbo { background: #ff4d4f; font-size: 24px; }
+        .btn-turbo:active { transform: scale(0.95); background: #ff7875; }
+        .btn-pause { background: #1890ff; width: 50px; height: 50px; }
+
+        /* 电脑端键盘提示 (手机隐藏) */
+        .pc-hint { 
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            color: #666; font-size: 12px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            .pc-hint { display: none; }
+            .month-nav { display: none; } /* 手机屏太小，暂时隐藏月份条，专注飞行 */
+        }
+        @media (min-width: 769px) {
+            #mobile-controls { display: none; } /* 电脑端隐藏虚拟手柄 */
+        }
+
+        /* 月份导航 (仅大屏显示) */
+        .month-nav {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            pointer-events: auto; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 30px;
+            display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; width: 80%;
+        }
+        .month-btn {
+            background: #333; color: #ccc; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px;
+        }
+        .month-btn:hover { background: #ffd700; color: #000; }
+
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
-        <div class="header">
-            <h1>📊 2025 贵金属实盘复盘 <span class="badge">USD数据版</span></h1>
-            <p class="sub-text">数据来源：真实市场收盘价 (单位：美元/盎司)</p>
+        <div class="top-panel">
+            <div class="header-box">
+                <h1>🚀 2025 贵金属夜航 <span class="badge">手机版</span></h1>
+                <p class="sub-text">Pt | Au | Ag | Pd 全年实盘</p>
+            </div>
         </div>
 
         <div id="tooltip">
             <span id="tt-metal" class="metal-tag tag-Au">现货黄金</span>
             <h3 id="tt-date">2025-01-01</h3>
-            <div>收盘价: <span id="tt-price" class="price">$2650</span></div>
+            <div>收盘: <span id="tt-price" class="price">$2650</span></div>
             <span id="tt-percent" class="percent">-0.5%</span>
         </div>
 
-        <div id="controls">
-            <button id="toggleBtn" onclick="toggleFlight()">⏸ 暂停复盘</button>
-            <button onclick="resetCamera()">👀 全局视角</button>
+        <div class="month-nav">
+            <button class="month-btn" onclick="jumpToMonth(0)">1月</button>
+            <button class="month-btn" onclick="jumpToMonth(2)">3月</button>
+            <button class="month-btn" onclick="jumpToMonth(5)">6月</button>
+            <button class="month-btn" onclick="jumpToMonth(8)">9月</button>
+            <button class="month-btn" onclick="jumpToMonth(11)">12月</button>
+            <button class="month-btn" style="background:#444;" onclick="resetCamera()">🔄 重置</button>
+        </div>
+
+        <div class="pc-hint">💻 电脑操作：WASD控制 | Shift加速 | 空格暂停</div>
+
+        <div id="mobile-controls">
+            <div class="d-pad">
+                <div class="d-btn btn-up" ontouchstart="setKey('Up', true)" ontouchend="setKey('Up', false)">▲</div>
+                <div class="d-btn btn-down" ontouchstart="setKey('Down', true)" ontouchend="setKey('Down', false)">▼</div>
+                <div class="d-btn btn-left" ontouchstart="setKey('Left', true)" ontouchend="setKey('Left', false)">◀</div>
+                <div class="d-btn btn-right" ontouchstart="setKey('Right', true)" ontouchend="setKey('Right', false)">▶</div>
+            </div>
+            
+            <div class="action-area">
+                <button class="round-btn btn-pause" onclick="toggleFlight()">⏸</button>
+                <button class="round-btn btn-turbo" ontouchstart="setTurbo(true)" ontouchend="setTurbo(false)">🚀</button>
+            </div>
         </div>
     </div>
 
@@ -97,23 +163,17 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // --- 1. 真实数据注入 (修正为美元价格) ---
-        // 数据说明：
-        // 黄金(Au): $2657 -> $4532 (美元/盎司)
-        // 白银(Ag): $29.5 -> $79.3 (美元/盎司)
-        
         const metals = [
-            { id: 'Pt', name: '现货铂金', color: '#e5e4e2' }, // 最左侧
-            { id: 'Au', name: '现货黄金', color: '#ffd700' }, // 中间左
-            { id: 'Ag', name: '现货白银', color: '#c0c0c0' }, // 中间右
-            { id: 'Pd', name: '现货钯金', color: '#8899a6' }  // 最右侧
+            { id: 'Pt', name: '现货铂金', color: '#e5e4e2' },
+            { id: 'Au', name: '现货黄金', color: '#ffd700' },
+            { id: 'Ag', name: '现货白银', color: '#c0c0c0' },
+            { id: 'Pd', name: '现货钯金', color: '#8899a6' }
         ];
-
         const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
-
-        // 真实数据 (格式: [日期号, 价格, 涨跌幅%])
+        
+        // 真实数据
         const rawData = {
-            "Au": [ // 黄金 USD
+            "Au": [ 
                 [[2,2657.2,0],[3,2638.4,-0.71],[6,2636.0,-0.09],[7,2648.2,0.46],[8,2661.1,0.49],[9,2669.5,0.32],[10,2689.8,0.76],[13,2662.5,-1.01],[14,2676.9,0.54],[15,2695.7,0.70],[16,2713.7,0.67],[17,2702.1,-0.43],[20,2710.4,0.31],[21,2744.0,1.24],[22,2755.8,0.43],[23,2754.1,-0.06],[24,2770.0,0.58],[27,2739.8,-1.09],[28,2763.0,0.85],[29,2758.6,-0.16],[30,2793.5,1.26],[31,2798.1,0.17]],
                 [[3,2814.1,0.57],[4,2841.4,0.97],[5,2866.2,0.87],[6,2855.8,-0.36],[7,2860.1,0.15],[10,2907.6,1.66],[11,2897.2,-0.36],[12,2904.0,0.23],[13,2927.3,0.80],[14,2882.1,-1.54],[17,2898.6,0.57],[18,2935.5,1.27],[19,2933.2,-0.08],[20,2939.0,0.20],[21,2935.0,-0.14],[24,2952.7,0.60],[25,2914.5,-1.29],[26,2916.0,0.05],[27,2876.5,-1.36],[28,2857.0,-0.68]],
                 [[3,2891.4,1.20],[4,2916.6,0.87],[5,2918.7,0.07],[6,2911.0,-0.27],[7,2909.4,-0.06],[10,2888.5,-0.72],[11,2915.8,0.95],[12,2932.9,0.59],[13,2988.3,1.89],[14,2983.8,-0.15],[17,3000.4,0.56],[18,3034.3,1.13],[19,3046.8,0.41],[20,3044.3,-0.08],[21,3022.8,-0.71],[24,3011.4,-0.38],[25,3019.8,0.28],[26,3019.1,-0.02],[27,3055.5,1.21],[28,3084.3,0.94],[31,3122.9,1.25]],
@@ -127,7 +187,7 @@
                 [[3,4001.1,-0.04],[4,3932.0,-1.73],[5,3979.8,1.22],[6,3976.9,-0.07],[7,4000.3,0.59],[10,4115.6,2.88],[11,4125.5,0.24],[12,4194.6,1.68],[13,4170.9,-0.57],[14,4082.2,-2.13],[17,4044.5,-0.92],[18,4066.6,0.55],[19,4077.0,0.26],[20,4076.6,-0.01],[21,4064.3,-0.30],[24,4134.7,1.73],[25,4131.9,-0.07],[26,4162.6,0.74],[27,4156.9,-0.14],[28,4218.6,1.48]],
                 [[1,4231.3,0.30],[2,4205.7,-0.60],[3,4202.9,-0.07],[4,4207.9,0.12],[5,4197.4,-0.25],[8,4189.9,-0.18],[9,4206.6,0.40],[10,4227.6,0.50],[11,4279.1,1.22],[12,4299.3,0.47],[15,4304.0,0.11],[16,4302.8,-0.03],[17,4337.3,0.80],[18,4331.2,-0.14],[19,4341.1,0.23],[22,4444.0,2.37],[23,4484.9,0.92],[24,4479.4,-0.12],[26,4532.5,1.19]]
             ],
-            "Ag": [ // 白银 USD
+            "Ag": [ 
                 [[2,29.52,0],[3,29.60,0.26],[6,29.93,1.14],[7,30.03,0.30],[8,30.08,0.17],[9,30.10,0.07],[10,30.38,0.94],[13,29.60,-2.56],[14,29.87,0.90],[15,30.65,2.63],[16,30.79,0.45],[17,30.32,-1.52],[20,30.47,0.48],[21,30.77,1.00],[22,30.79,0.04],[23,30.39,-1.30],[24,30.52,0.44],[27,30.18,-1.12],[28,30.39,0.71],[29,30.80,1.35],[30,31.63,2.70],[31,31.30,-1.06]],
                 [[3,31.55,0.81],[4,32.12,1.79],[5,32.28,0.51],[6,32.17,-0.33],[7,31.77,-1.26],[10,32.02,0.80],[11,31.81,-0.67],[12,32.21,1.27],[13,32.33,0.37],[14,32.11,-0.68],[17,32.36,0.77],[18,32.86,1.55],[19,32.69,-0.52],[20,32.95,0.80],[21,32.42,-1.61],[24,32.33,-0.29],[25,31.73,-1.85],[26,31.86,0.41],[27,31.23,-1.97],[28,31.12,-0.37]],
                 [[3,31.66,1.75],[4,31.95,0.91],[5,32.63,2.14],[6,32.63,-0.02],[7,32.51,-0.36],[10,32.06,-1.37],[11,32.93,2.70],[12,33.22,0.90],[13,33.85,1.90],[14,33.83,-0.06],[17,33.85,0.06],[18,34.00,0.43],[19,33.80,-0.60],[20,33.58,-0.65],[21,33.02,-1.66],[24,32.99,-0.08],[25,33.72,2.20],[26,33.62,-0.29],[27,34.39,2.29],[28,34.11,-0.81],[31,34.07,-0.12]],
@@ -141,7 +201,7 @@
                 [[3,48.07,-1.21],[4,47.12,-1.97],[5,47.97,1.80],[6,48.01,0.07],[7,48.33,0.67],[10,50.49,4.48],[11,51.21,1.43],[12,53.26,3.99],[13,52.33,-1.74],[14,50.52,-3.47],[17,50.18,-0.67],[18,50.68,0.99],[19,51.29,1.21],[20,50.64,-1.26],[21,49.99,-1.29],[24,51.35,2.72],[25,51.44,0.18],[26,53.33,3.67],[27,53.37,0.09],[28,56.40,5.66]],
                 [[1,57.96,2.76],[2,58.45,0.85],[3,58.47,0.04],[4,57.09,-2.35],[5,58.29,2.10],[8,58.13,-0.27],[9,60.65,4.33],[10,61.73,1.78],[11,63.55,2.95],[12,61.92,-2.57],[15,64.03,3.40],[16,63.68,-0.54],[17,66.25,4.03],[18,65.43,-1.24],[19,67.05,2.48],[22,69.05,2.98],[23,71.41,3.42],[24,71.81,0.56],[26,79.33,10.47]]
             ],
-            "Pt": [ // 铂金 USD
+            "Pt": [
                 [[2,921.8,0],[3,934.3,1.36],[6,934.0,-0.03],[7,946.9,1.38],[8,952.6,0.60],[9,955.4,0.29],[10,958.0,0.27],[13,949.9,-0.85],[14,941.0,-0.94],[15,936.7,-0.46],[16,933.2,-0.37],[17,936.3,0.33],[20,941.2,0.52],[21,943.2,0.21],[22,948.8,0.59],[23,941.3,-0.79],[24,945.7,0.47],[27,945.5,-0.02],[28,940.4,-0.54],[29,944.7,0.46],[30,964.6,2.11],[31,975.5,1.13]],
                 [[3,964.6,-1.12],[4,964.2,-0.04],[5,976.1,1.23],[6,983.5,0.76],[7,968.0,-1.58],[10,987.2,1.98],[11,983.2,-0.41],[12,993.2,1.02],[13,997.4,0.42],[14,972.7,-2.48],[17,980.1,0.76],[18,983.7,0.37],[19,973.8,-1.01],[20,979.3,0.56],[21,966.9,-1.27],[24,967.7,0.08],[25,972.3,0.48],[26,966.5,-0.60],[27,947.9,-1.92],[28,947.3,-0.06]],
                 [[3,952.9,0.59],[4,962.2,0.98],[5,966.1,0.41],[6,967.7,0.17],[7,960.4,-0.75],[10,958.3,-0.22],[11,979.6,2.22],[12,984.6,0.51],[13,994.4,1.00],[14,991.0,-0.34],[17,999.6,0.87],[18,1001.6,0.20],[19,996.6,-0.50],[20,983.1,-1.35],[21,976.7,-0.65],[24,974.5,-0.23],[25,978.4,0.40],[26,975.4,-0.31],[27,985.4,1.03],[28,983.6,-0.18],[31,994.5,1.11]],
@@ -155,7 +215,7 @@
                 [[3,1567.6,-0.12],[4,1539.0,-1.82],[5,1561.2,1.44],[6,1528.0,-2.13],[7,1544.5,1.08],[10,1574.1,1.91],[11,1579.9,0.37],[12,1616.7,2.33],[13,1585.7,-1.92],[14,1539.1,-2.94],[17,1535.2,-0.25],[18,1530.1,-0.33],[19,1546.2,1.05],[20,1518.4,-1.80],[21,1512.0,-0.42],[24,1553.7,2.76],[25,1552.9,-0.05],[26,1588.3,2.28],[27,1608.7,1.28],[28,1668.5,3.72]],
                 [[1,1663.2,-0.32],[2,1640.5,-1.36],[3,1672.5,1.95],[4,1641.7,-1.84],[5,1635.0,-0.41],[8,1651.4,1.00],[9,1688.9,2.27],[10,1655.2,-2.00],[11,1696.0,2.46],[12,1742.3,2.73],[15,1785.3,2.47],[16,1834.6,2.76],[17,1906.2,3.90],[18,1920.9,0.77],[19,1957.7,1.92],[22,2106.7,7.61],[23,2285.0,8.46],[24,2253.0,-1.40],[26,2459.5,9.17]]
             ],
-            "Pd": [ // 钯金 USD
+            "Pd": [ 
                 [[2,911.4,0],[3,924.4,1.42],[6,922.1,-0.24],[7,928.0,0.64],[8,926.1,-0.20],[9,927.7,0.17],[10,942.6,1.60],[13,942.6,0.01],[14,939.8,-0.30],[15,963.4,2.50],[16,954.4,-0.93],[17,945.8,-0.90],[20,945.9,0.01],[21,962.4,1.75],[22,980.9,1.93],[23,990.3,0.95],[24,980.9,-0.95],[27,962.3,-1.89],[28,955.0,-0.76],[29,961.3,0.66],[30,986.1,2.58],[31,1010.4,2.46]],
                 [[3,1011.3,0.10],[4,992.2,-1.89],[5,993.7,0.15],[6,982.3,-1.15],[7,966.3,-1.63],[10,978.7,1.29],[11,978.5,-0.03],[12,972.9,-0.57],[13,996.1,2.39],[14,962.2,-3.40],[17,974.3,1.26],[18,984.6,1.05],[19,972.3,-1.25],[20,979.4,0.73],[21,965.5,-1.42],[24,942.3,-2.41],[25,929.9,-1.32],[26,926.8,-0.32],[27,918.3,-0.92],[28,917.7,-0.07]],
                 [[3,936.8,2.08],[4,947.1,1.10],[5,942.8,-0.45],[6,941.8,-0.11],[7,945.1,0.36],[10,938.6,-0.69],[11,943.6,0.53],[12,950.5,0.74],[13,959.9,0.99],[14,962.2,0.24],[17,968.1,0.61],[18,966.8,-0.13],[19,959.7,-0.74],[20,950.1,-1.00],[21,954.3,0.45],[24,950.2,-0.43],[25,957.3,0.75],[26,966.0,0.90],[27,976.5,1.09],[28,968.9,-0.78],[31,989.6,2.14]],
@@ -171,21 +231,19 @@
             ]
         };
 
-        // 解压数据函数
         function getMetalData(metalId) {
             const data = [];
             const yearlyData = rawData[metalId];
             
             for (let m = 0; m < 12; m++) {
                 const monthRaw = yearlyData[m] || [];
-                // 获取当月1号是周几，用于布局空位
                 const startDay = new Date(2025, m, 1).getDay(); 
                 
                 const days = monthRaw.map(item => ({
                     date: `2025-${(m+1).toString().padStart(2,'0')}-${item[0].toString().padStart(2,'0')}`,
-                    price: item[1].toFixed(2), // 价格保留两位小数
-                    change: item[2],           // 涨跌幅
-                    dayOfMonth: item[0]        // 用于精准定位网格
+                    price: item[1].toFixed(2), 
+                    change: item[2],           
+                    dayOfMonth: item[0]        
                 }));
 
                 data.push({
@@ -202,17 +260,16 @@
             fullData[metal.id] = getMetalData(metal.id);
         });
 
-        // 辅助：文字贴图
-        function createTextTexture(text, size=60, color='#333') {
+        function createTextTexture(text, size=60, color='#ffffff') {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 128;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = 'rgba(0,0,0,0)';
             ctx.clearRect(0,0,512,128);
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
+            ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
             ctx.font = `bold ${size}px "Microsoft YaHei", sans-serif`;
             ctx.fillStyle = color;
             ctx.textAlign = 'center';
@@ -223,19 +280,19 @@
 
         // --- 2. 场景初始化 ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xe0e5ec);
-        scene.fog = new THREE.Fog(0xe0e5ec, 50, 180);
+        scene.background = new THREE.Color(0x0b0c10); 
+        scene.fog = new THREE.Fog(0x0b0c10, 50, 180);
 
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 0.8);
         scene.add(hemiLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(50, 100, 50);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 4096;
@@ -246,7 +303,7 @@
         const clickableObjects = [];
         const redMat = new THREE.MeshStandardMaterial({ color: 0xff4d4f, roughness: 0.2 });
         const greenMat = new THREE.MeshStandardMaterial({ color: 0x00b894, roughness: 0.2 });
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
 
         const barSize = 1.2;
         const gap = 0.3;
@@ -255,8 +312,7 @@
         const laneGapX = 25;
 
         for(let m=0; m<12; m++) {
-            // 月份地面标签
-            const labelTex = createTextTexture(monthNames[m], 70, '#555');
+            const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
             const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
             const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
             const centerX = (metals.length - 1) * laneGapX / 2; 
@@ -270,13 +326,11 @@
                 const posX = metalIdx * laneGapX;
                 const posZ = -m * monthGapZ;
 
-                // 底座
                 const base = new THREE.Mesh(new THREE.BoxGeometry(cellSize * 7 + 1, 0.2, cellSize * 6 + 1), baseMat);
                 base.position.set(cellSize * 3, -0.1, cellSize * 2.5);
                 base.receiveShadow = true;
                 group.add(base);
 
-                // 仅首月显示车道名
                 if(m === 0) {
                     const nameTex = createTextTexture(metal.name, 50, metal.color);
                     const nameMesh = new THREE.Mesh(new THREE.PlaneGeometry(12, 3), new THREE.MeshBasicMaterial({ map: nameTex, transparent: true }));
@@ -286,17 +340,13 @@
                 }
 
                 monthData.days.forEach((day) => {
-                    // 核心逻辑：精准定位到日期对应的网格格子
-                    // 格子索引 = (日期 - 1) + 月初偏移量
                     const gridIndex = (day.dayOfMonth - 1) + monthData.startDay;
                     const col = gridIndex % 7;
                     const row = Math.floor(gridIndex / 7);
                     
-                    // 高度映射：为了让视觉更震撼，稍微放大高度
-                    // 最小高度0.2，防止0涨跌幅看不见
                     let h = Math.abs(day.change) * 4; 
                     if(h < 0.2) h = 0.2;
-                    if(h > 30) h = 30; // 封顶防止穿模
+                    if(h > 30) h = 30; 
 
                     const bar = new THREE.Mesh(new THREE.BoxGeometry(barSize, h, barSize), day.change >= 0 ? redMat : greenMat);
                     bar.position.set(col * cellSize, h / 2, row * cellSize);
@@ -313,13 +363,16 @@
 
         // --- 4. 飞机与HUD ---
         const planeGroup = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.5, 16), new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 }));
+        const body = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.5, 16), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 }));
         body.rotation.x = -Math.PI / 2;
-        const wing = new THREE.Mesh(new THREE.BoxGeometry(5, 0.1, 1), new THREE.MeshStandardMaterial({ color: 0xd63031 })); // 红色机翼
+        const wing = new THREE.Mesh(new THREE.BoxGeometry(5, 0.1, 1), new THREE.MeshStandardMaterial({ color: 0xd63031, emissive: 0x550000 })); 
         planeGroup.add(body, wing);
-        
+        const engineLight = new THREE.PointLight(0x00ffff, 1, 10);
+        engineLight.position.set(0, 0, 2);
+        planeGroup.add(engineLight);
+
         const startCenterX = (metals.length - 1) * laneGapX / 2;
-        planeGroup.position.set(startCenterX, 15, 20);
+        planeGroup.position.set(startCenterX, 35, 20); 
         scene.add(planeGroup);
 
         const hudLabels = [];
@@ -333,30 +386,96 @@
             hudLabels.push({ mesh: hudMesh, xOffset: posX });
         });
 
-        // --- 5. 交互 ---
+        // --- 5. 交互与控制 ---
         let isFlying = true;
-        let flightSpeed = 0.2;
+        let baseSpeed = 0.2;
+        let turboSpeed = 1.0; // 加速倍率
+        let currentSpeed = baseSpeed;
         const totalDist = 12 * monthGapZ + 20;
+
+        const keys = { Left: false, Right: false, Up: false, Down: false, Turbo: false };
+        let planeVelocityX = 0;
+        let planeVelocityY = 0;
+        const maxVel = 0.8;
+        const acceleration = 0.05;
+        const friction = 0.92;
+        const minX = -10; 
+        const maxX = (metals.length - 1) * laneGapX + 10;
+        const minY = 5; 
+        const maxY = 60;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = true;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = true;
+            if (e.key === 'Shift') setTurbo(true);
+            if (e.code === 'Space') toggleFlight();
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = false;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = false;
+            if (e.key === 'Shift') setTurbo(false);
+        });
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.enablePan = true;
+        controls.enablePan = false;
+        controls.enableRotate = false; // 禁用鼠标旋转！
         controls.target.set(startCenterX, 0, -20);
 
         window.toggleFlight = function() {
             isFlying = !isFlying;
             const btn = document.getElementById('toggleBtn');
-            btn.innerText = isFlying ? "⏸ 暂停复盘" : "▶ 继续复盘";
+            btn.innerText = isFlying ? "⏸ 暂停飞行" : "▶ 继续飞行";
             btn.classList.toggle('stop', !isFlying);
+            
+            // 暂停时启用旋转，飞行时禁用
+            controls.enableRotate = !isFlying;
+        };
+
+        window.setTurbo = function(active) {
+            keys.Turbo = active;
+            const btn = document.getElementById('turboBtn');
+            if(active) {
+                currentSpeed = turboSpeed;
+                btn.style.transform = "scale(1.1)";
+                btn.style.filter = "brightness(1.5)";
+            } else {
+                currentSpeed = baseSpeed;
+                btn.style.transform = "scale(1)";
+                btn.style.filter = "brightness(1)";
+            }
+        };
+
+        window.jumpToMonth = function(monthIndex) {
+            // 计算目标Z坐标 (-m * 45)
+            const targetZ = -monthIndex * monthGapZ + 10;
+            
+            // 瞬移飞机
+            planeGroup.position.z = targetZ;
+            
+            // 稍微重置一下物理速度，防止瞬移后乱飘
+            planeVelocityX = 0;
+            planeVelocityY = 0;
+            planeGroup.position.x = startCenterX; // 回到中间跑道
+            planeGroup.position.y = 35; // 回到安全高度
+
+            // 瞬移相机
+            const targetCamPos = planeGroup.position.clone();
+            targetCamPos.y = 35; 
+            targetCamPos.z += 40;
+            camera.position.copy(targetCamPos);
+            
+            // 如果是暂停状态，自动开始飞行体验会更好，或者保持暂停
+            // 这里保持原状态，如果是暂停的，用户点跳转后还是暂停的，方便看那个月
         };
 
         window.resetCamera = function() {
-            isFlying = false; 
-            document.getElementById('toggleBtn').innerText = "▶ 继续复盘";
-            const target = new THREE.Vector3(startCenterX, 0, planeGroup.position.z - 50);
-            camera.position.set(startCenterX, 70, planeGroup.position.z + 50);
-            camera.lookAt(target);
-            controls.target.copy(target);
+            jumpToMonth(0); // 直接跳回1月
+            if(!isFlying) toggleFlight(); // 如果是暂停的，恢复飞行
         }
 
         const raycaster = new THREE.Raycaster();
@@ -364,7 +483,11 @@
         let selectedObj = null;
 
         window.addEventListener('click', (e) => {
-            if (e.target.closest('#controls')) return;
+            // 只有暂停时才允许点击交互
+            if (isFlying) return;
+
+            if (e.target.closest('.bottom-panel') || e.target.closest('.top-panel')) return;
+            
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -388,8 +511,6 @@
                 const pEl = document.getElementById('tt-percent');
                 pEl.innerText = (data.change >= 0 ? "+" : "") + data.change.toFixed(2) + "%";
                 pEl.className = "percent " + (data.change >= 0 ? "txt-red" : "txt-green");
-
-                if(isFlying) toggleFlight();
             } else {
                 tooltip.style.display = 'none';
                 if(selectedObj) selectedObj.material.emissive.setHex(0x000000);
@@ -401,20 +522,42 @@
             requestAnimationFrame(animate);
 
             if (isFlying) {
-                planeGroup.position.z -= flightSpeed;
-                planeGroup.position.x = startCenterX + Math.sin(Date.now() * 0.0005) * 10; 
-                planeGroup.rotation.z = -Math.sin(Date.now() * 0.0005) * 0.1;
-
+                planeGroup.position.z -= currentSpeed;
                 if (planeGroup.position.z < -totalDist) {
                     planeGroup.position.z = 20;
                 }
 
+                if (keys.Left) planeVelocityX -= acceleration;
+                if (keys.Right) planeVelocityX += acceleration;
+                if (keys.Up) planeVelocityY += acceleration;
+                if (keys.Down) planeVelocityY -= acceleration;
+                
+                planeVelocityX = Math.max(-maxVel, Math.min(maxVel, planeVelocityX));
+                planeVelocityY = Math.max(-maxVel, Math.min(maxVel, planeVelocityY));
+                
+                if (!keys.Left && !keys.Right) planeVelocityX *= friction;
+                if (!keys.Up && !keys.Down) planeVelocityY *= friction;
+
+                planeGroup.position.x += planeVelocityX;
+                planeGroup.position.y += planeVelocityY;
+
+                if (planeGroup.position.x < minX) { planeGroup.position.x = minX; planeVelocityX = 0; }
+                if (planeGroup.position.x > maxX) { planeGroup.position.x = maxX; planeVelocityX = 0; }
+                if (planeGroup.position.y < minY) { planeGroup.position.y = minY; planeVelocityY = 0; }
+                if (planeGroup.position.y > maxY) { planeGroup.position.y = maxY; planeVelocityY = 0; }
+
+                planeGroup.rotation.z = -planeVelocityX * 0.5;
+                planeGroup.rotation.x = planeVelocityY * 0.3;
+
                 const targetCamPos = planeGroup.position.clone();
-                targetCamPos.y = 30; 
-                targetCamPos.z += 40;
-                targetCamPos.x = startCenterX; 
-                camera.position.lerp(targetCamPos, 0.05);
-                camera.lookAt(startCenterX, 0, planeGroup.position.z - 10);
+                targetCamPos.y = Math.max(20, planeGroup.position.y + 10);
+                targetCamPos.z += 40; 
+                camera.position.lerp(targetCamPos, 0.08);
+                
+                const lookTarget = planeGroup.position.clone();
+                lookTarget.z -= 20;
+                camera.lookAt(lookTarget);
+
             } else {
                 controls.update();
             }
@@ -422,7 +565,7 @@
             const labelZ = planeGroup.position.z - 30;
             hudLabels.forEach(label => {
                 label.mesh.position.z = labelZ;
-                label.mesh.position.y = 12 + Math.sin(Date.now() * 0.001) * 0.5;
+                label.mesh.position.y = 15 + Math.sin(Date.now() * 0.001) * 0.5;
                 label.mesh.rotation.x = -Math.PI / 6; 
             });
 
