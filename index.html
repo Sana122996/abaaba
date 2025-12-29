@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2025 贵金属夜航·手机完美适配版</title>
+    <title>2025 贵金属夜航</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; /* 禁止默认触摸行为 */ }
+        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; }
         
+        #loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #ffd700; font-size: 20px; font-weight: bold; z-index: 999;
+            text-shadow: 0 0 10px black; pointer-events: none;
+        }
+
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -16,7 +22,7 @@
         /* 顶部面板 */
         .top-panel { padding: 15px; pointer-events: auto; }
         .header-box {
-            background: rgba(20, 20, 20, 0.9); padding: 10px 15px; border-radius: 12px;
+            background: rgba(20, 20, 20, 0.95); padding: 10px 15px; border-radius: 12px;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); border-left: 4px solid #ffd700; color: #fff;
             display: inline-block; max-width: 90%;
         }
@@ -40,18 +46,27 @@
         .tag-Au { background-color: #ffd700; } .tag-Ag { background-color: #c0c0c0; }
         .tag-Pt { background-color: #e5e4e2; } .tag-Pd { background-color: #ced4da; }
 
-        /* --- 手机端虚拟控制器 --- */
+        /* 月份导航 (电脑端) */
+        .month-nav {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            pointer-events: auto; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 30px;
+            display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; width: 80%;
+            z-index: 20;
+        }
+        .month-btn {
+            background: #333; color: #ccc; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px;
+        }
+        .month-btn:hover { background: #ffd700; color: #000; }
+
+        /* 手机端虚拟控制器 */
         #mobile-controls {
             position: absolute; bottom: 20px; width: 100%; height: 160px;
-            pointer-events: none; /* 让点击穿透空白区域 */
+            pointer-events: none;
             display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box;
+            z-index: 30;
         }
         
-        /* 十字方向键区域 */
-        .d-pad {
-            position: relative; width: 140px; height: 140px;
-            pointer-events: auto; /* 允许触摸 */
-        }
+        .d-pad { position: relative; width: 140px; height: 140px; pointer-events: auto; }
         .d-btn {
             position: absolute; width: 45px; height: 45px;
             background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3);
@@ -66,11 +81,7 @@
         .btn-left { top: 47.5px; left: 0; }
         .btn-right { top: 47.5px; right: 0; }
 
-        /* 右侧操作区 */
-        .action-area {
-            display: flex; flex-direction: column; gap: 15px; align-items: flex-end;
-            pointer-events: auto;
-        }
+        .action-area { display: flex; flex-direction: column; gap: 15px; align-items: flex-end; pointer-events: auto; }
         .round-btn {
             width: 60px; height: 60px; border-radius: 50%;
             border: none; color: white; font-weight: bold;
@@ -79,41 +90,24 @@
         }
         .btn-turbo { background: #ff4d4f; font-size: 24px; }
         .btn-turbo:active { transform: scale(0.95); background: #ff7875; }
-        .btn-pause { background: #1890ff; width: 50px; height: 50px; }
+        .btn-pause { background: #1890ff; width: 50px; height: 50px; font-size: 20px;}
 
-        /* 电脑端键盘提示 (手机隐藏) */
-        .pc-hint { 
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            color: #666; font-size: 12px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 20px;
-        }
-        @media (max-width: 768px) {
-            .pc-hint { display: none; }
-            .month-nav { display: none; } /* 手机屏太小，暂时隐藏月份条，专注飞行 */
-        }
-        @media (min-width: 769px) {
-            #mobile-controls { display: none; } /* 电脑端隐藏虚拟手柄 */
-        }
-
-        /* 月份导航 (仅大屏显示) */
-        .month-nav {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            pointer-events: auto; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 30px;
-            display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; width: 80%;
-        }
-        .month-btn {
-            background: #333; color: #ccc; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px;
-        }
-        .month-btn:hover { background: #ffd700; color: #000; }
-
+        @media (max-width: 768px) { .month-nav { display: none; } }
+        @media (min-width: 769px) { #mobile-controls { display: none; } }
     </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
-    <div id="ui-layer">
+    <div id="loading">资源加载中，请稍候...</div>
+
+    <div id="ui-layer" style="display:none;">
         <div class="top-panel">
             <div class="header-box">
-                <h1>🚀 2025 贵金属夜航 <span class="badge">手机版</span></h1>
-                <p class="sub-text">Pt | Au | Ag | Pd 全年实盘</p>
+                <h1>🚀 2025 贵金属夜航 <span class="badge">万能版</span></h1>
+                <p class="sub-text">真实收盘价复盘 | 暂停后视角锁定</p>
             </div>
         </div>
 
@@ -131,9 +125,8 @@
             <button class="month-btn" onclick="jumpToMonth(8)">9月</button>
             <button class="month-btn" onclick="jumpToMonth(11)">12月</button>
             <button class="month-btn" style="background:#444;" onclick="resetCamera()">🔄 重置</button>
+            <div style="color:#666; font-size:12px; margin-left:10px; align-self:center;">空格暂停 | Shift加速</div>
         </div>
-
-        <div class="pc-hint">💻 电脑操作：WASD控制 | Shift加速 | 空格暂停</div>
 
         <div id="mobile-controls">
             <div class="d-pad">
@@ -144,25 +137,28 @@
             </div>
             
             <div class="action-area">
-                <button class="round-btn btn-pause" onclick="toggleFlight()">⏸</button>
+                <button id="mobPauseBtn" class="round-btn btn-pause" onclick="toggleFlight()">⏸</button>
                 <button class="round-btn btn-turbo" ontouchstart="setTurbo(true)" ontouchend="setTurbo(false)">🚀</button>
             </div>
         </div>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+    <script>
+        // 核心修复：直接使用全局变量，不使用 import
+        
+        // 等待页面加载完成
+        window.onload = function() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('ui-layer').style.display = 'flex';
+            initGame();
+        };
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+        let camera, scene, renderer, controls;
+        let planeGroup, hudLabels = [];
+        let clickableObjects = [];
+        let isFlying = true;
+        
+        // 真实数据注入
         const metals = [
             { id: 'Pt', name: '现货铂金', color: '#e5e4e2' },
             { id: 'Au', name: '现货黄金', color: '#ffd700' },
@@ -171,7 +167,6 @@
         ];
         const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
         
-        // 真实数据
         const rawData = {
             "Au": [ 
                 [[2,2657.2,0],[3,2638.4,-0.71],[6,2636.0,-0.09],[7,2648.2,0.46],[8,2661.1,0.49],[9,2669.5,0.32],[10,2689.8,0.76],[13,2662.5,-1.01],[14,2676.9,0.54],[15,2695.7,0.70],[16,2713.7,0.67],[17,2702.1,-0.43],[20,2710.4,0.31],[21,2744.0,1.24],[22,2755.8,0.43],[23,2754.1,-0.06],[24,2770.0,0.58],[27,2739.8,-1.09],[28,2763.0,0.85],[29,2758.6,-0.16],[30,2793.5,1.26],[31,2798.1,0.17]],
@@ -234,31 +229,22 @@
         function getMetalData(metalId) {
             const data = [];
             const yearlyData = rawData[metalId];
-            
             for (let m = 0; m < 12; m++) {
                 const monthRaw = yearlyData[m] || [];
                 const startDay = new Date(2025, m, 1).getDay(); 
-                
                 const days = monthRaw.map(item => ({
                     date: `2025-${(m+1).toString().padStart(2,'0')}-${item[0].toString().padStart(2,'0')}`,
                     price: item[1].toFixed(2), 
                     change: item[2],           
                     dayOfMonth: item[0]        
                 }));
-
-                data.push({
-                    monthName: monthNames[m],
-                    days: days,
-                    startDay: startDay
-                });
+                data.push({ monthName: monthNames[m], days: days, startDay: startDay });
             }
             return data;
         }
 
         const fullData = {};
-        metals.forEach(metal => {
-            fullData[metal.id] = getMetalData(metal.id);
-        });
+        metals.forEach(metal => { fullData[metal.id] = getMetalData(metal.id); });
 
         function createTextTexture(text, size=60, color='#ffffff') {
             const canvas = document.createElement('canvas');
@@ -279,131 +265,143 @@
         }
 
         // --- 2. 场景初始化 ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b0c10); 
-        scene.fog = new THREE.Fog(0x0b0c10, 50, 180);
+        function initGame() {
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b0c10); 
+            scene.fog = new THREE.Fog(0x0b0c10, 50, 180);
 
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        document.body.appendChild(renderer.domElement);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
 
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 0.8);
-        scene.add(hemiLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(50, 100, 50);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 4096;
-        dirLight.shadow.mapSize.height = 4096;
-        scene.add(dirLight);
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 0.8);
+            scene.add(hemiLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(50, 100, 50);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 4096;
+            dirLight.shadow.mapSize.height = 4096;
+            scene.add(dirLight);
 
-        // --- 3. 构建 3D 世界 ---
-        const clickableObjects = [];
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xff4d4f, roughness: 0.2 });
-        const greenMat = new THREE.MeshStandardMaterial({ color: 0x00b894, roughness: 0.2 });
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+            // 构建3D世界
+            const redMat = new THREE.MeshStandardMaterial({ color: 0xff4d4f, roughness: 0.2 });
+            const greenMat = new THREE.MeshStandardMaterial({ color: 0x00b894, roughness: 0.2 });
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
 
-        const barSize = 1.2;
-        const gap = 0.3;
-        const cellSize = barSize + gap;
-        const monthGapZ = 45;
-        const laneGapX = 25;
+            const barSize = 1.2;
+            const gap = 0.3;
+            const cellSize = barSize + gap;
+            const monthGapZ = 45;
+            const laneGapX = 25;
 
-        for(let m=0; m<12; m++) {
-            const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
-            const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
-            const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
-            const centerX = (metals.length - 1) * laneGapX / 2; 
-            labelMesh.position.set(centerX, 0.5, -m * monthGapZ - 5);
-            labelMesh.rotation.x = -Math.PI / 2;
-            scene.add(labelMesh);
+            for(let m=0; m<12; m++) {
+                const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
+                const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
+                const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
+                const centerX = (metals.length - 1) * laneGapX / 2; 
+                labelMesh.position.set(centerX, 0.5, -m * monthGapZ - 5);
+                labelMesh.rotation.x = -Math.PI / 2;
+                scene.add(labelMesh);
 
-            metals.forEach((metal, metalIdx) => {
-                const monthData = fullData[metal.id][m];
-                const group = new THREE.Group();
-                const posX = metalIdx * laneGapX;
-                const posZ = -m * monthGapZ;
+                metals.forEach((metal, metalIdx) => {
+                    const monthData = fullData[metal.id][m];
+                    const group = new THREE.Group();
+                    const posX = metalIdx * laneGapX;
+                    const posZ = -m * monthGapZ;
 
-                const base = new THREE.Mesh(new THREE.BoxGeometry(cellSize * 7 + 1, 0.2, cellSize * 6 + 1), baseMat);
-                base.position.set(cellSize * 3, -0.1, cellSize * 2.5);
-                base.receiveShadow = true;
-                group.add(base);
+                    const base = new THREE.Mesh(new THREE.BoxGeometry(cellSize * 7 + 1, 0.2, cellSize * 6 + 1), baseMat);
+                    base.position.set(cellSize * 3, -0.1, cellSize * 2.5);
+                    base.receiveShadow = true;
+                    group.add(base);
 
-                if(m === 0) {
-                    const nameTex = createTextTexture(metal.name, 50, metal.color);
-                    const nameMesh = new THREE.Mesh(new THREE.PlaneGeometry(12, 3), new THREE.MeshBasicMaterial({ map: nameTex, transparent: true }));
-                    nameMesh.position.set(cellSize * 3, 2, -5);
-                    nameMesh.rotation.x = -Math.PI / 6; 
-                    group.add(nameMesh);
-                }
+                    if(m === 0) {
+                        const nameTex = createTextTexture(metal.name, 50, metal.color);
+                        const nameMesh = new THREE.Mesh(new THREE.PlaneGeometry(12, 3), new THREE.MeshBasicMaterial({ map: nameTex, transparent: true }));
+                        nameMesh.position.set(cellSize * 3, 2, -5);
+                        nameMesh.rotation.x = -Math.PI / 6; 
+                        group.add(nameMesh);
+                    }
 
-                monthData.days.forEach((day) => {
-                    const gridIndex = (day.dayOfMonth - 1) + monthData.startDay;
-                    const col = gridIndex % 7;
-                    const row = Math.floor(gridIndex / 7);
-                    
-                    let h = Math.abs(day.change) * 4; 
-                    if(h < 0.2) h = 0.2;
-                    if(h > 30) h = 30; 
-
-                    const bar = new THREE.Mesh(new THREE.BoxGeometry(barSize, h, barSize), day.change >= 0 ? redMat : greenMat);
-                    bar.position.set(col * cellSize, h / 2, row * cellSize);
-                    bar.castShadow = true;
-                    bar.receiveShadow = true;
-                    bar.userData = { ...day, metalName: metal.name, metalId: metal.id }; 
-                    group.add(bar);
-                    clickableObjects.push(bar);
+                    monthData.days.forEach((day) => {
+                        const gridIndex = (day.dayOfMonth - 1) + monthData.startDay;
+                        const col = gridIndex % 7;
+                        const row = Math.floor(gridIndex / 7);
+                        let h = Math.abs(day.change) * 4; 
+                        if(h < 0.2) h = 0.2;
+                        if(h > 30) h = 30; 
+                        const bar = new THREE.Mesh(new THREE.BoxGeometry(barSize, h, barSize), day.change >= 0 ? redMat : greenMat);
+                        bar.position.set(col * cellSize, h / 2, row * cellSize);
+                        bar.castShadow = true;
+                        bar.receiveShadow = true;
+                        bar.userData = { ...day, metalName: metal.name, metalId: metal.id }; 
+                        group.add(bar);
+                        clickableObjects.push(bar);
+                    });
+                    group.position.set(posX - 5, 0, posZ); 
+                    scene.add(group);
                 });
-                group.position.set(posX - 5, 0, posZ); 
-                scene.add(group);
+            }
+
+            // 飞机
+            planeGroup = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.5, 16), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 }));
+            body.rotation.x = -Math.PI / 2;
+            const wing = new THREE.Mesh(new THREE.BoxGeometry(5, 0.1, 1), new THREE.MeshStandardMaterial({ color: 0xd63031, emissive: 0x550000 })); 
+            planeGroup.add(body, wing);
+            const engineLight = new THREE.PointLight(0x00ffff, 1, 10);
+            engineLight.position.set(0, 0, 2);
+            planeGroup.add(engineLight);
+
+            const startCenterX = (metals.length - 1) * laneGapX / 2;
+            planeGroup.position.set(startCenterX, 35, 20); 
+            scene.add(planeGroup);
+
+            // HUD
+            metals.forEach((metal, idx) => {
+                const posX = idx * laneGapX - 5 + (cellSize * 3); 
+                const hudTex = createTextTexture(metal.name, 80, metal.color); 
+                const hudMat = new THREE.MeshBasicMaterial({ map: hudTex, transparent: true, opacity: 0.95 });
+                const hudMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), hudMat);
+                hudMesh.position.set(posX, 12, 0); 
+                scene.add(hudMesh);
+                hudLabels.push({ mesh: hudMesh, xOffset: posX });
             });
+
+            // 初始化控制器
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = false; // 禁用阻尼，完全静止
+            controls.enablePan = false;
+            controls.enableRotate = false; // 始终禁止旋转，确保不晕
+            controls.enableZoom = false; // 禁用缩放，防止穿模
+            controls.target.set(startCenterX, 0, -20);
+
+            // 强制更新一次相机位置
+            updateCameraPosition(true);
+
+            animate();
         }
 
-        // --- 4. 飞机与HUD ---
-        const planeGroup = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.5, 16), new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 }));
-        body.rotation.x = -Math.PI / 2;
-        const wing = new THREE.Mesh(new THREE.BoxGeometry(5, 0.1, 1), new THREE.MeshStandardMaterial({ color: 0xd63031, emissive: 0x550000 })); 
-        planeGroup.add(body, wing);
-        const engineLight = new THREE.PointLight(0x00ffff, 1, 10);
-        engineLight.position.set(0, 0, 2);
-        planeGroup.add(engineLight);
-
-        const startCenterX = (metals.length - 1) * laneGapX / 2;
-        planeGroup.position.set(startCenterX, 35, 20); 
-        scene.add(planeGroup);
-
-        const hudLabels = [];
-        metals.forEach((metal, idx) => {
-            const posX = idx * laneGapX - 5 + (cellSize * 3); 
-            const hudTex = createTextTexture(metal.name, 80, metal.color); 
-            const hudMat = new THREE.MeshBasicMaterial({ map: hudTex, transparent: true, opacity: 0.95 });
-            const hudMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), hudMat);
-            hudMesh.position.set(posX, 12, 0); 
-            scene.add(hudMesh);
-            hudLabels.push({ mesh: hudMesh, xOffset: posX });
-        });
-
         // --- 5. 交互与控制 ---
-        let isFlying = true;
         let baseSpeed = 0.2;
-        let turboSpeed = 1.0; // 加速倍率
+        let turboSpeed = 1.0; 
         let currentSpeed = baseSpeed;
-        const totalDist = 12 * monthGapZ + 20;
+        const totalDist = 12 * 45 + 20;
 
-        const keys = { Left: false, Right: false, Up: false, Down: false, Turbo: false };
+        const keys = { Left: false, Right: false, Up: false, Down: false };
         let planeVelocityX = 0;
         let planeVelocityY = 0;
         const maxVel = 0.8;
         const acceleration = 0.05;
         const friction = 0.92;
         const minX = -10; 
-        const maxX = (metals.length - 1) * laneGapX + 10;
+        const maxX = (metals.length - 1) * 25 + 10;
         const minY = 5; 
         const maxY = 60;
 
+        // 键盘事件
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
@@ -420,62 +418,47 @@
             if (e.key === 'Shift') setTurbo(false);
         });
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.enablePan = false;
-        controls.enableRotate = false; // 禁用鼠标旋转！
-        controls.target.set(startCenterX, 0, -20);
+        // 触摸事件
+        window.setKey = function(keyName, active) { keys[keyName] = active; };
 
         window.toggleFlight = function() {
             isFlying = !isFlying;
             const btn = document.getElementById('toggleBtn');
-            btn.innerText = isFlying ? "⏸ 暂停飞行" : "▶ 继续飞行";
-            btn.classList.toggle('stop', !isFlying);
-            
-            // 暂停时启用旋转，飞行时禁用
-            controls.enableRotate = !isFlying;
+            const mobBtn = document.getElementById('mobPauseBtn');
+            const txt = isFlying ? "⏸ 暂停飞行" : "▶ 继续飞行";
+            const icon = isFlying ? "⏸" : "▶";
+            if(btn) { btn.innerText = txt; btn.classList.toggle('stop', !isFlying); }
+            if(mobBtn) { mobBtn.innerText = icon; mobBtn.style.background = isFlying ? "#1890ff" : "#ff4d4f"; }
         };
 
         window.setTurbo = function(active) {
-            keys.Turbo = active;
             const btn = document.getElementById('turboBtn');
             if(active) {
                 currentSpeed = turboSpeed;
-                btn.style.transform = "scale(1.1)";
-                btn.style.filter = "brightness(1.5)";
+                if(btn) btn.style.transform = "scale(1.1)";
             } else {
                 currentSpeed = baseSpeed;
-                btn.style.transform = "scale(1)";
-                btn.style.filter = "brightness(1)";
+                if(btn) btn.style.transform = "scale(1)";
             }
         };
 
         window.jumpToMonth = function(monthIndex) {
-            // 计算目标Z坐标 (-m * 45)
-            const targetZ = -monthIndex * monthGapZ + 10;
+            const targetZ = -monthIndex * 45 + 10;
+            const startCenterX = (metals.length - 1) * 25 / 2;
             
-            // 瞬移飞机
             planeGroup.position.z = targetZ;
-            
-            // 稍微重置一下物理速度，防止瞬移后乱飘
             planeVelocityX = 0;
             planeVelocityY = 0;
-            planeGroup.position.x = startCenterX; // 回到中间跑道
-            planeGroup.position.y = 35; // 回到安全高度
-
-            // 瞬移相机
-            const targetCamPos = planeGroup.position.clone();
-            targetCamPos.y = 35; 
-            targetCamPos.z += 40;
-            camera.position.copy(targetCamPos);
+            planeGroup.position.x = startCenterX; 
+            planeGroup.position.y = 35; 
             
-            // 如果是暂停状态，自动开始飞行体验会更好，或者保持暂停
-            // 这里保持原状态，如果是暂停的，用户点跳转后还是暂停的，方便看那个月
+            // 强制瞬移更新相机，不插值
+            updateCameraPosition(true);
         };
 
         window.resetCamera = function() {
-            jumpToMonth(0); // 直接跳回1月
-            if(!isFlying) toggleFlight(); // 如果是暂停的，恢复飞行
+            jumpToMonth(0);
+            if(!isFlying) toggleFlight();
         }
 
         const raycaster = new THREE.Raycaster();
@@ -483,10 +466,8 @@
         let selectedObj = null;
 
         window.addEventListener('click', (e) => {
-            // 只有暂停时才允许点击交互
-            if (isFlying) return;
-
-            if (e.target.closest('.bottom-panel') || e.target.closest('.top-panel')) return;
+            if (isFlying) return; 
+            if (e.target.closest('#mobile-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
             
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -501,7 +482,7 @@
 
                 const data = selectedObj.userData;
                 tooltip.style.display = 'block';
-                tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 200) + 'px';
+                tooltip.style.left = Math.min(e.clientX + 15, window.innerWidth - 150) + 'px';
                 tooltip.style.top = e.clientY + 15 + 'px';
                 
                 document.getElementById('tt-metal').innerText = data.metalName;
@@ -517,6 +498,39 @@
                 selectedObj = null;
             }
         });
+
+        // 封装相机逻辑
+        function updateCameraPosition(force = false) {
+            // 基础相机位置 (PC默认)
+            let camHeight = Math.max(20, planeGroup.position.y + 10);
+            let camDist = 40;
+            
+            // 手机端适配：屏幕越窄，拉得越远越高
+            const aspect = window.innerWidth / window.innerHeight;
+            if(aspect < 1.0) { // 竖屏
+                camHeight += 20; 
+                camDist += 30;   
+            }
+
+            const targetCamPos = planeGroup.position.clone();
+            targetCamPos.y = camHeight;
+            targetCamPos.z += camDist;
+            
+            // 关键修改：如果force=true(跳转/重置) 或者 isFlying=false(暂停)，直接瞬移，不平滑
+            if (force || !isFlying) {
+                camera.position.copy(targetCamPos);
+                const lookTarget = planeGroup.position.clone();
+                lookTarget.z -= 20;
+                camera.lookAt(lookTarget);
+                if(controls) controls.target.copy(lookTarget);
+            } else {
+                // 只有在飞行时才开启一点点平滑
+                camera.position.lerp(targetCamPos, 0.1); // 加快跟随速度，减少“漂移感”
+                const lookTarget = planeGroup.position.clone();
+                lookTarget.z -= 20;
+                camera.lookAt(lookTarget);
+            }
+        }
 
         function animate() {
             requestAnimationFrame(animate);
@@ -549,17 +563,12 @@
                 planeGroup.rotation.z = -planeVelocityX * 0.5;
                 planeGroup.rotation.x = planeVelocityY * 0.3;
 
-                const targetCamPos = planeGroup.position.clone();
-                targetCamPos.y = Math.max(20, planeGroup.position.y + 10);
-                targetCamPos.z += 40; 
-                camera.position.lerp(targetCamPos, 0.08);
-                
-                const lookTarget = planeGroup.position.clone();
-                lookTarget.z -= 20;
-                camera.lookAt(lookTarget);
+                // 只有飞行时更新相机
+                updateCameraPosition(false);
 
             } else {
-                controls.update();
+                // 暂停时强制锁定相机位置，防止 OrbitControls 惯性漂移
+                updateCameraPosition(true);
             }
 
             const labelZ = planeGroup.position.z - 30;
@@ -573,12 +582,14 @@
         }
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            if(camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                // 窗口改变时强制重置视角
+                updateCameraPosition(true);
+            }
         });
-
-        animate();
 
     </script>
 </body>
