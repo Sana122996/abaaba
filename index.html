@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2025 贵金属夜航·极值标注版</title>
+    <title>2025 贵金属夜航·沉浸版</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,17 +84,7 @@
         .tag-Au { background-color: #ffd700; } .tag-Ag { background-color: #c0c0c0; }
         .tag-Pt { background-color: #e5e4e2; } .tag-Pd { background-color: #ced4da; }
 
-        .month-nav {
-            position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
-            pointer-events: auto; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 30px;
-            display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; width: 80%;
-            z-index: 20;
-        }
-        .month-btn {
-            background: #333; color: #ccc; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px;
-            font-family: 'Noto Sans SC', sans-serif;
-        }
-        .month-btn:hover { background: #ffd700; color: #000; }
+        /* 月份导航栏 CSS 已移除 */
 
         #game-controls {
             position: absolute; bottom: 20px; width: 100%; height: 140px;
@@ -133,7 +123,6 @@
         .btn-turbo:active, .btn-turbo.active { background: #ff4d4f; }
 
         @media (max-width: 768px) { 
-            .month-nav { display: none; } 
             #game-controls { padding: 0 20px; }
         }
     </style>
@@ -153,7 +142,7 @@
             <div class="header-box">
                 <p class="data-date">数据统计截至2025年12月30日收盘价</p>
                 <h1>🚀 2025 贵金属夜航 <span class="badge">极值修正版</span></h1>
-                <p class="sub-text">1月 ➔ 12月 | 左手升降 右手转向</p>
+                <p class="sub-text">1月 ➔ 12月 | 左手升降 右手转向 | 空格键暂停</p>
             </div>
         </div>
 
@@ -162,22 +151,6 @@
             <h3 id="tt-date" style="margin: 5px 0; font-size: 16px;">2025-01-01</h3>
             <div>收盘: <span id="tt-price" class="price">$2650</span></div>
             <span id="tt-percent" class="percent">-0.5%</span>
-        </div>
-
-        <div class="month-nav">
-            <button class="month-btn" onclick="jumpToMonth(0)">1月</button>
-            <button class="month-btn" onclick="jumpToMonth(1)">2月</button>
-            <button class="month-btn" onclick="jumpToMonth(2)">3月</button>
-            <button class="month-btn" onclick="jumpToMonth(3)">4月</button>
-            <button class="month-btn" onclick="jumpToMonth(4)">5月</button>
-            <button class="month-btn" onclick="jumpToMonth(5)">6月</button>
-            <button class="month-btn" onclick="jumpToMonth(6)">7月</button>
-            <button class="month-btn" onclick="jumpToMonth(7)">8月</button>
-            <button class="month-btn" onclick="jumpToMonth(8)">9月</button>
-            <button class="month-btn" onclick="jumpToMonth(9)">10月</button>
-            <button class="month-btn" onclick="jumpToMonth(10)">11月</button>
-            <button class="month-btn" onclick="jumpToMonth(11)">12月</button>
-            <button class="month-btn" style="background:#444;" onclick="resetCamera()">🔄 重置</button>
         </div>
 
         <div id="game-controls">
@@ -410,14 +383,7 @@
             for(let m=0; m<12; m++) {
                 const posZ = -m * monthGapZ;
                 
-                // 月份标签
-                const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
-                const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
-                const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
-                const centerX = (metals.length - 1) * laneGapX / 2; 
-                labelMesh.position.set(centerX, 0.5, posZ + 5); 
-                labelMesh.rotation.x = -Math.PI / 2;
-                scene.add(labelMesh);
+                // --- 已删除 3D 月份标签 ---
 
                 metals.forEach((metal, metalIdx) => {
                     const monthData = fullData[metal.id][m];
@@ -545,7 +511,12 @@
             if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = true;
             if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = true;
             if (e.key === 'Shift') setTurbo(true);
-            if (e.code === 'Space') toggleFlight();
+            
+            // 空格键暂停逻辑
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault(); 
+                toggleFlight();
+            }
         });
         window.addEventListener('keyup', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = false;
@@ -631,12 +602,12 @@
         }
 
         window.addEventListener('click', (e) => {
-            if (e.target.closest('#game-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
+            if (e.target.closest('#game-controls') || e.target.closest('.header-box')) return;
             handleRaycast(e.clientX, e.clientY);
         });
 
         window.addEventListener('touchstart', (e) => {
-            if (e.target.closest('#game-controls') || e.target.closest('.month-nav') || e.target.closest('.header-box')) return;
+            if (e.target.closest('#game-controls') || e.target.closest('.header-box')) return;
             if (e.touches.length > 0) {
                 const touch = e.touches[0];
                 handleRaycast(touch.clientX, touch.clientY);
