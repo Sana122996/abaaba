@@ -84,8 +84,6 @@
         .tag-Au { background-color: #ffd700; } .tag-Ag { background-color: #c0c0c0; }
         .tag-Pt { background-color: #e5e4e2; } .tag-Pd { background-color: #ced4da; }
 
-        /* 月份导航栏 CSS 已移除 */
-
         #game-controls {
             position: absolute; bottom: 20px; width: 100%; height: 140px;
             pointer-events: none;
@@ -383,7 +381,15 @@
             for(let m=0; m<12; m++) {
                 const posZ = -m * monthGapZ;
                 
-                // --- 已删除 3D 月份标签 ---
+                // --- 月份地标 (恢复显示) ---
+                const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
+                const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
+                const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
+                // 居中放置在跑道中央
+                const centerX = (metals.length - 1) * laneGapX / 2; 
+                labelMesh.position.set(centerX, 0.5, posZ + 5); 
+                labelMesh.rotation.x = -Math.PI / 2;
+                scene.add(labelMesh);
 
                 metals.forEach((metal, metalIdx) => {
                     const monthData = fullData[metal.id][m];
