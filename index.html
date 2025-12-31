@@ -3,16 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2025 贵金属夜航·正序修正版</title>
+    <title>2025 贵金属夜航·极值标注版</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+
     <style>
-        body { margin: 0; overflow: hidden; background-color: #0b0c10; font-family: 'Microsoft YaHei', sans-serif; touch-action: none; user-select: none; -webkit-user-select: none; }
+        /* 全局字体定义：中文强制使用思源黑体 */
+        body { 
+            margin: 0; overflow: hidden; background-color: #0b0c10; 
+            font-family: 'Noto Sans SC', 'Source Han Sans CN', sans-serif; 
+            touch-action: none; user-select: none; -webkit-user-select: none; 
+        }
         
+        /* 数字专用字体栈：优先 D-DIN-PRO */
+        .din-font {
+            font-family: 'D-DIN-PRO', 'D-DIN', 'DIN Alternate', 'Oswald', 'Roboto Condensed', sans-serif;
+        }
+
         #loading {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b0c10;
             display: flex; justify-content: center; align-items: center;
             color: #ffd700; font-size: 20px; font-weight: bold; z-index: 9999;
             flex-direction: column; gap: 10px;
+            font-family: 'Noto Sans SC';
         }
         .spinner {
             width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid #ffd700; border-radius: 50%;
@@ -32,10 +48,13 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); border-left: 4px solid #ffd700; color: #fff;
             display: inline-block; max-width: 90%;
         }
-        .data-date { font-size: 12px; color: #ffd700; margin: 0 0 5px 0; opacity: 0.8; letter-spacing: 1px; }
+        .data-date { 
+            font-size: 12px; color: #ffd700; margin: 0 0 5px 0; opacity: 0.8; letter-spacing: 1px; 
+            font-family: 'Noto Sans SC'; 
+        }
         h1 { margin: 0; font-size: 18px; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 8px;}
-        .badge { background: #ffd700; color: #000; padding: 1px 6px; font-size: 10px; border-radius: 4px; }
-        .sub-text { font-size: 12px; color: #aaa; margin-top: 4px; }
+        .badge { background: #ffd700; color: #000; padding: 1px 6px; font-size: 10px; border-radius: 4px; font-weight: 700;}
+        .sub-text { font-size: 12px; color: #aaa; margin-top: 4px; font-family: 'Noto Sans SC'; }
         
         #tooltip {
             position: absolute; display: none;
@@ -45,9 +64,21 @@
             pointer-events: none; border: 1px solid #666;
             min-width: 140px; z-index: 100;
             transform: translate(10px, 10px);
+            font-family: 'Noto Sans SC', sans-serif;
         }
         .metal-tag { padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; font-weight: bold; color: #000; display: inline-block;}
-        #tooltip .price { font-size: 20px; font-weight: bold; color: #ffd700; font-family: 'DIN Alternate', sans-serif; }
+        
+        /* Tooltip 数字部分使用 D-DIN-PRO */
+        #tooltip .price { 
+            font-size: 24px; font-weight: bold; color: #ffd700; 
+            font-family: 'D-DIN-PRO', 'D-DIN', 'Oswald', sans-serif; 
+            letter-spacing: 1px; 
+        }
+        #tooltip .percent {
+            font-family: 'D-DIN-PRO', 'D-DIN', 'Oswald', sans-serif;
+            font-size: 18px;
+        }
+
         .txt-red { color: #ff4d4f; } .txt-green { color: #00cc66; }
         
         .tag-Au { background-color: #ffd700; } .tag-Ag { background-color: #c0c0c0; }
@@ -61,6 +92,7 @@
         }
         .month-btn {
             background: #333; color: #ccc; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px;
+            font-family: 'Noto Sans SC', sans-serif;
         }
         .month-btn:hover { background: #ffd700; color: #000; }
 
@@ -89,6 +121,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: transform 0.1s, background 0.1s;
             cursor: pointer;
+            font-family: 'Noto Sans SC';
         }
         .game-btn:active, .game-btn.active { background: rgba(255, 215, 0, 0.6); border-color: #ffd700; transform: scale(0.95); }
         .game-btn:hover { background: rgba(255,255,255,0.25); }
@@ -118,15 +151,15 @@
     <div id="ui-layer" style="display:none;">
         <div class="top-panel">
             <div class="header-box">
-                <p class="data-date">数据统计截至2025年12月30日</p>
-                <h1>🚀 2025 贵金属夜航 <span class="badge">正序版</span></h1>
+                <p class="data-date">数据统计截至2025年12月30日收盘价</p>
+                <h1>🚀 2025 贵金属夜航 <span class="badge">极值修正版</span></h1>
                 <p class="sub-text">1月 ➔ 12月 | 左手升降 右手转向</p>
             </div>
         </div>
 
         <div id="tooltip">
             <span id="tt-metal" class="metal-tag tag-Au">现货黄金</span>
-            <h3 id="tt-date">2025-01-01</h3>
+            <h3 id="tt-date" style="margin: 5px 0; font-size: 16px;">2025-01-01</h3>
             <div>收盘: <span id="tt-price" class="price">$2650</span></div>
             <span id="tt-percent" class="percent">-0.5%</span>
         </div>
@@ -195,7 +228,7 @@
         };
 
         let camera, scene, renderer, controls;
-        let planeGroup, hudLabels = [];
+        let planeGroup, hudLabels = [], floatLabels = [];
         let clickableObjects = [];
         let isFlying = true;
         
@@ -220,7 +253,7 @@
                 [[1,3475.5,0.83],[2,3532.4,1.64],[3,3558.5,0.74],[4,3544.6,-0.39],[5,3586.0,1.17],[8,3636.0,1.39],[9,3624.2,-0.33],[10,3639.8,0.43],[11,3633.5,-0.17],[12,3642.6,0.25],[15,3678.9,1.00],[16,3689.6,0.29],[17,3658.9,-0.83],[18,3643.8,-0.41],[19,3684.7,1.12],[22,3745.8,1.66],[23,3763.0,0.46],[24,3735.8,-0.72],[25,3748.4,0.34],[26,3758.8,0.28],[29,3832.9,1.97],[30,3857.8,0.65]],
                 [[1,3865.4,0.20],[2,3855.7,-0.25],[3,3885.7,0.78],[6,3959.0,1.89],[7,3984.3,0.64],[8,4040.4,1.41],[9,3976.0,-1.60],[10,4017.8,1.05],[13,4110.0,2.29],[14,4141.5,0.77],[15,4206.6,1.57],[16,4326.5,2.85],[17,4251.4,-1.73],[20,4355.7,2.45],[21,4124.4,-5.31],[22,4097.9,-0.64],[23,4126.5,0.70],[24,4111.6,-0.36],[27,3982.0,-3.15],[28,3951.9,-0.75],[29,3929.7,-0.56],[30,4024.5,2.41],[31,4002.7,-0.54]],
                 [[3,4001.1,-0.04],[4,3932.0,-1.73],[5,3979.8,1.22],[6,3976.9,-0.07],[7,4000.3,0.59],[10,4115.6,2.88],[11,4125.5,0.24],[12,4194.6,1.68],[13,4170.9,-0.57],[14,4082.2,-2.13],[17,4044.5,-0.92],[18,4066.6,0.55],[19,4077.0,0.26],[20,4076.6,-0.01],[21,4064.3,-0.30],[24,4134.7,1.73],[25,4131.9,-0.07],[26,4162.6,0.74],[27,4156.9,-0.14],[28,4218.6,1.48]],
-                // Au Update: 29日(-4.42%), 30日(+0.19%)
+                // Au Update
                 [[1,4231.3,0.30],[2,4205.7,-0.60],[3,4202.9,-0.07],[4,4207.9,0.12],[5,4197.4,-0.25],[8,4189.9,-0.18],[9,4206.6,0.40],[10,4227.6,0.50],[11,4279.1,1.22],[12,4299.3,0.47],[15,4304.0,0.11],[16,4302.8,-0.03],[17,4337.3,0.80],[18,4331.2,-0.14],[19,4341.1,0.23],[22,4444.0,2.37],[23,4484.9,0.92],[24,4479.4,-0.12],[26,4532.5,1.19],[29,4331.96,-4.42],[30,4340.13,0.19]]
             ],
             "Ag": [ 
@@ -235,7 +268,7 @@
                 [[1,40.67,2.48],[2,40.82,0.36],[3,41.19,0.91],[4,40.65,-1.30],[5,40.97,0.77],[8,41.34,0.90],[9,40.86,-1.16],[10,41.14,0.70],[11,41.50,0.87],[12,42.16,1.59],[15,42.67,1.20],[16,42.55,-0.27],[17,41.64,-2.14],[18,41.80,0.38],[19,43.06,3.02],[22,43.99,2.16],[23,44.01,0.05],[24,43.89,-0.29],[25,45.13,2.83],[26,46.03,2.00],[29,46.91,1.90],[30,46.65,-0.54]],
                 [[1,47.28,1.34],[2,46.94,-0.73],[3,47.98,2.22],[6,48.49,1.06],[7,47.81,-1.40],[8,48.86,2.20],[9,49.21,0.71],[10,50.13,1.87],[13,52.33,4.39],[14,51.41,-1.76],[15,53.05,3.19],[16,54.14,2.06],[17,51.86,-4.21],[20,52.39,1.01],[21,48.66,-7.11],[22,48.44,-0.46],[23,48.85,0.86],[24,48.62,-0.47],[27,46.97,-3.41],[28,47.03,0.13],[29,47.49,0.98],[30,48.89,2.94],[31,48.66,-0.48]],
                 [[3,48.07,-1.21],[4,47.12,-1.97],[5,47.97,1.80],[6,48.01,0.07],[7,48.33,0.67],[10,50.49,4.48],[11,51.21,1.43],[12,53.26,3.99],[13,52.33,-1.74],[14,50.52,-3.47],[17,50.18,-0.67],[18,50.68,0.99],[19,51.29,1.21],[20,50.64,-1.26],[21,49.99,-1.29],[24,51.35,2.72],[25,51.44,0.18],[26,53.33,3.67],[27,53.37,0.09],[28,56.40,5.66]],
-                // Ag Update: 29日(-9.08%), 30日(+5.67%)
+                // Ag Update
                 [[1,57.96,2.76],[2,58.45,0.85],[3,58.47,0.04],[4,57.09,-2.35],[5,58.29,2.10],[8,58.13,-0.27],[9,60.65,4.33],[10,61.73,1.78],[11,63.55,2.95],[12,61.92,-2.57],[15,64.03,3.40],[16,63.68,-0.54],[17,66.25,4.03],[18,65.43,-1.24],[19,67.05,2.48],[22,69.05,2.98],[23,71.41,3.42],[24,71.81,0.56],[26,79.33,10.47],[29,72.13,-9.08],[30,76.21,5.67]]
             ],
             "Pt": [
@@ -250,7 +283,7 @@
                 [[1,1405.7,2.90],[2,1408.2,0.18],[3,1408.5,0.02],[4,1374.1,-2.44],[5,1372.7,-0.10],[8,1384.3,0.85],[9,1373.3,-0.79],[10,1391.2,1.30],[11,1383.6,-0.55],[12,1400.1,1.19],[15,1404.4,0.31],[16,1396.4,-0.57],[17,1365.6,-2.21],[18,1383.4,1.30],[19,1402.4,1.37],[22,1412.7,0.73],[23,1475.3,4.43],[24,1471.1,-0.28],[25,1521.2,3.41],[26,1575.9,3.60],[29,1598.6,1.44],[30,1571.7,-1.68]],
                 [[1,1566.3,-0.34],[2,1575.3,0.57],[3,1603.0,1.76],[6,1621.9,1.18],[7,1625.9,0.25],[8,1654.6,1.77],[9,1618.4,-2.19],[10,1597.5,-1.29],[13,1624.4,1.68],[14,1629.7,0.33],[15,1662.9,2.04],[16,1714.8,3.12],[17,1605.6,-6.37],[20,1628.3,1.41],[21,1544.3,-5.16],[22,1624.1,5.17],[23,1626.9,0.17],[24,1601.1,-1.59],[27,1585.9,-0.95],[28,1586.2,0.02],[29,1590.4,0.26],[30,1599.9,0.60],[31,1569.5,-1.90]],
                 [[3,1567.6,-0.12],[4,1539.0,-1.82],[5,1561.2,1.44],[6,1528.0,-2.13],[7,1544.5,1.08],[10,1574.1,1.91],[11,1579.9,0.37],[12,1616.7,2.33],[13,1585.7,-1.92],[14,1539.1,-2.94],[17,1535.2,-0.25],[18,1530.1,-0.33],[19,1546.2,1.05],[20,1518.4,-1.80],[21,1512.0,-0.42],[24,1553.7,2.76],[25,1552.9,-0.05],[26,1588.3,2.28],[27,1608.7,1.28],[28,1668.5,3.72]],
-                // Pt Update: 29日(-14.52%), 30日(+3.61%)
+                // Pt Update
                 [[1,1663.2,-0.32],[2,1640.5,-1.36],[3,1672.5,1.95],[4,1641.7,-1.84],[5,1635.0,-0.41],[8,1651.4,1.00],[9,1688.9,2.27],[10,1655.2,-2.00],[11,1696.0,2.46],[12,1742.3,2.73],[15,1785.3,2.47],[16,1834.6,2.76],[17,1906.2,3.90],[18,1920.9,0.77],[19,1957.7,1.92],[22,2106.7,7.61],[23,2285.0,8.46],[24,2253.0,-1.40],[26,2459.5,9.17],[29,2102.5,-14.52],[30,2178.5,3.61]]
             ],
             "Pd": [ 
@@ -265,7 +298,7 @@
                 [[1,1134.5,2.75],[2,1137.5,0.26],[3,1141.0,0.31],[4,1125.5,-1.36],[5,1108.9,-1.48],[8,1138.0,2.63],[9,1143.0,0.44],[10,1175.5,2.84],[11,1191.0,1.32],[12,1196.1,0.43],[15,1199.0,0.24],[16,1182.5,-1.38],[17,1158.0,-2.07],[18,1162.5,0.39],[19,1153.5,-0.77],[22,1181.5,2.43],[23,1220.5,3.30],[24,1203.0,-1.43],[25,1256.7,4.46],[26,1268.3,0.92],[29,1270.5,0.18],[30,1257.4,-1.03]],
                 [[1,1254.5,-0.23],[2,1253.0,-0.12],[3,1262.0,0.72],[6,1322.5,4.80],[7,1349.5,2.04],[8,1449.0,7.37],[9,1419.5,-2.04],[10,1417.0,-0.18],[13,1479.0,4.38],[14,1519.0,2.70],[15,1547.0,1.84],[16,1620.6,4.76],[17,1468.2,-9.40],[20,1501.5,2.27],[21,1405.5,-6.39],[22,1457.5,3.70],[23,1454.0,-0.24],[24,1416.0,-2.61],[27,1401.0,-1.06],[28,1399.0,-0.14],[29,1395.5,-0.25],[30,1450.5,3.94],[31,1436.5,-0.97]],
                 [[3,1444.0,0.52],[4,1402.5,-2.87],[5,1421.0,1.32],[6,1378.5,-2.99],[7,1381.5,0.22],[10,1413.5,2.32],[11,1448.0,2.44],[12,1467.5,1.35],[13,1433.5,-2.32],[14,1400.2,-2.32],[17,1396.0,-0.30],[18,1398.5,0.18],[19,1387.7,-0.78],[20,1386.5,-0.08],[21,1377.5,-0.65],[24,1400.0,1.63],[25,1391.0,-0.64],[26,1426.5,2.55],[27,1431.3,0.33],[28,1448.2,1.18]],
-                // Pd Update: 29日已存在, 增加30日(-1.23%)
+                // Pd Update
                 [[1,1424.8,-1.61],[2,1465.6,2.86],[3,1461.0,-0.31],[4,1456.1,-0.34],[5,1457.1,0.07],[8,1475.0,1.23],[9,1507.0,2.17],[10,1476.5,-2.02],[11,1492.0,1.05],[12,1490.3,-0.11],[15,1572.5,5.51],[16,1606.0,2.13],[17,1646.5,2.52],[18,1700.0,3.25],[19,1712.0,0.71],[22,1766.0,3.15],[23,1858.0,5.21],[24,1723.5,-7.24],[26,1925.0,11.69],[29,1621.0,-15.79],[30,1601.0,-1.23]]
             ]
         };
@@ -290,6 +323,39 @@
         const fullData = {};
         metals.forEach(metal => { fullData[metal.id] = getMetalData(metal.id); });
 
+        // 创建精灵文字标签（始终面向相机）
+        function createSpriteText(text, color='#ffffff', isBold=false) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = 'rgba(0,0,0,0)';
+            ctx.clearRect(0,0,256,256);
+            
+            // 绘制文字
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const lines = text.split('\n');
+            // 第一行日期，较小，使用思源黑体
+            ctx.font = 'bold 32px "Noto Sans SC"';
+            ctx.fillStyle = '#cccccc';
+            ctx.fillText(lines[0], 128, 90);
+            
+            // 第二行数值，很大，使用 DIN 风格
+            ctx.font = 'bold 64px "D-DIN-PRO", "D-DIN", "Oswald", sans-serif';
+            ctx.fillStyle = color;
+            ctx.shadowColor = "rgba(0,0,0,1)";
+            ctx.shadowBlur = 4;
+            ctx.fillText(lines[1], 128, 160);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(10, 10, 1);
+            return sprite;
+        }
+
         function createTextTexture(text, size=60, color='#ffffff') {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 128;
@@ -300,7 +366,8 @@
             ctx.shadowBlur = 6;
             ctx.shadowOffsetX = 3;
             ctx.shadowOffsetY = 3;
-            ctx.font = `bold ${size}px "Microsoft YaHei", sans-serif`;
+            // 使用思源黑体
+            ctx.font = `bold ${size}px "Noto Sans SC", "Source Han Sans CN", sans-serif`;
             ctx.fillStyle = color;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -339,18 +406,16 @@
             const monthGapZ = 45;
             const laneGapX = 25;
 
-            // 核心修正：时间正序排列
-            // 飞机向负Z轴飞，所以1月应该在Z=30，2月在Z=-15... 以此类推
-            
+            // 构建场景
             for(let m=0; m<12; m++) {
                 const posZ = -m * monthGapZ;
                 
-                // 月份标签 (放在月份起点前一点)
+                // 月份标签
                 const labelTex = createTextTexture(monthNames[m], 70, '#ffffff');
                 const labelMat = new THREE.MeshBasicMaterial({ map: labelTex, transparent: true });
                 const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), labelMat);
                 const centerX = (metals.length - 1) * laneGapX / 2; 
-                labelMesh.position.set(centerX, 0.5, posZ + 5); // 放在起点前5单位
+                labelMesh.position.set(centerX, 0.5, posZ + 5); 
                 labelMesh.rotation.x = -Math.PI / 2;
                 scene.add(labelMesh);
 
@@ -360,7 +425,6 @@
                     const posX = metalIdx * laneGapX;
 
                     const base = new THREE.Mesh(new THREE.BoxGeometry(cellSize * 7 + 1, 0.2, cellSize * 6 + 1), baseMat);
-                    // 底座中心修正：往负Z方向偏移一半长度，因为Bar是往负Z生长的
                     base.position.set(cellSize * 3, -0.1, -cellSize * 2.5); 
                     base.receiveShadow = true;
                     group.add(base);
@@ -368,11 +432,23 @@
                     if(m === 0) {
                         const nameTex = createTextTexture(metal.name, 50, metal.color);
                         const nameMesh = new THREE.Mesh(new THREE.PlaneGeometry(12, 3), new THREE.MeshBasicMaterial({ map: nameTex, transparent: true }));
-                        nameMesh.position.set(cellSize * 3, 2, 5); // 放在1月起点前
+                        nameMesh.position.set(cellSize * 3, 2, 5); 
                         nameMesh.rotation.x = -Math.PI / 6; 
                         group.add(nameMesh);
                     }
 
+                    // 1. 找出本月、本金属的最大涨幅和最大跌幅
+                    let maxRise = -Infinity;
+                    let maxFall = Infinity;
+                    let maxRiseDay = null;
+                    let maxFallDay = null;
+
+                    monthData.days.forEach(day => {
+                        if (day.change > maxRise) { maxRise = day.change; maxRiseDay = day; }
+                        if (day.change < maxFall) { maxFall = day.change; maxFallDay = day; }
+                    });
+
+                    // 2. 生成柱子
                     monthData.days.forEach((day) => {
                         const gridIndex = (day.dayOfMonth - 1) + monthData.startDay;
                         const col = gridIndex % 7;
@@ -382,17 +458,31 @@
                         if(h > 30) h = 30; 
                         const bar = new THREE.Mesh(new THREE.BoxGeometry(barSize, h, barSize), day.change >= 0 ? redMat : greenMat);
                         
-                        // 核心修正：Z轴使用负数 (-row)，让日期顺着飞行方向延伸
-                        bar.position.set(col * cellSize, h / 2, -row * cellSize);
+                        // 位置
+                        const barX = col * cellSize;
+                        const barZ = -row * cellSize;
+                        bar.position.set(barX, h / 2, barZ);
                         
                         bar.castShadow = true;
                         bar.receiveShadow = true;
                         bar.userData = { ...day, metalName: metal.name, metalId: metal.id }; 
                         group.add(bar);
                         clickableObjects.push(bar);
+
+                        // 3. 如果是极值天，添加悬浮标签
+                        if (day === maxRiseDay && maxRise > 0) {
+                            const labelText = `${day.date.slice(5)}\n+${day.change}%`;
+                            const sprite = createSpriteText(labelText, '#ff4d4f', true);
+                            sprite.position.set(barX, h + 3.5, barZ); // 悬浮在柱顶上方
+                            group.add(sprite);
+                        } else if (day === maxFallDay && maxFall < 0) {
+                            const labelText = `${day.date.slice(5)}\n${day.change}%`;
+                            const sprite = createSpriteText(labelText, '#00b894', true);
+                            sprite.position.set(barX, h + 3.5, barZ); // 悬浮在柱顶上方
+                            group.add(sprite);
+                        }
                     });
                     
-                    // Group位置不变
                     group.position.set(posX - 5, 0, posZ); 
                     scene.add(group);
                 });
@@ -409,7 +499,6 @@
 
             const startCenterX = (metals.length - 1) * laneGapX / 2;
             
-            // 初始位置：放在1月标签前 (Z=30)
             planeGroup.position.set(startCenterX, 35, 30); 
             scene.add(planeGroup);
 
@@ -483,7 +572,6 @@
         };
 
         window.jumpToMonth = function(monthIndex) {
-            // 计算跳转位置：-m*45 + 15 (留出一段助跑距离)
             const targetZ = -monthIndex * 45 + 15;
             const startCenterX = (metals.length - 1) * 25 / 2;
             
@@ -590,7 +678,7 @@
             if (isFlying) {
                 planeGroup.position.z -= currentSpeed;
                 if (planeGroup.position.z < -totalDist) {
-                    planeGroup.position.z = 30; // 循环回到起点
+                    planeGroup.position.z = 30; 
                 }
 
                 if (keys.Left) planeVelocityX -= acceleration;
